@@ -530,8 +530,8 @@ export default function DashboardPage() {
   const handleCollectionSave = async (data: Partial<Collection>) => {
     if (!currentVideo) return;
     try {
-      if (editingCollection) {
-        await storage.updateCollection(editingCollection.id, data);
+      if (selectedCollection) {
+        await storage.updateCollection(selectedCollection.id, data);
       } else {
         const newCollection: Omit<
           Collection,
@@ -723,7 +723,7 @@ export default function DashboardPage() {
     if (format === "json") {
       exportVideoDataAsJSON(currentVideo, annotations, collections);
     } else {
-      exportAnnotationsAsCSV(annotations, currentVideo.title);
+      exportAnnotationsAsCSV(currentVideo, annotations, collections);
     }
   };
 
@@ -898,6 +898,7 @@ export default function DashboardPage() {
                       onRemoveAnnotation={handleRemoveAnnotationFromCollection}
                       onReorderAnnotations={handleReorderAnnotations}
                       onCollectionChange={setSelectedCollection}
+                      onSave={handleCollectionSave}
                     />
                   </div>
                 )}
