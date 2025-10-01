@@ -1,74 +1,87 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { X, Plus } from "lucide-react"
-import type { Collection, Template } from "@/lib/types"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { X, Plus } from "lucide-react";
+import type { Collection, Template } from "@/lib/types";
 
 interface CollectionFormProps {
-  collection?: Collection
-  templates: Template[]
-  videoId: string
-  onSave: (data: Partial<Collection>) => void
-  onCancel: () => void
+  collection?: Collection;
+  templates: Template[];
+  videoId: string;
+  onSave: (data: Partial<Collection>) => void;
+  onCancel: () => void;
 }
 
-export function CollectionForm({ collection, templates, videoId, onSave, onCancel }: CollectionFormProps) {
-  const [name, setName] = useState(collection?.name || "")
-  const [description, setDescription] = useState(collection?.description || "")
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | undefined>(collection?.templateId)
-  const [metadata, setMetadata] = useState<Record<string, any>>(collection?.metadata || {})
+export function CollectionForm({
+  collection,
+  templates,
+  videoId,
+  onSave,
+  onCancel,
+}: CollectionFormProps) {
+  const [name, setName] = useState(collection?.name || "");
+  const [description, setDescription] = useState(collection?.description || "");
+  const [metadata, setMetadata] = useState<Record<string, any>>(
+    collection?.metadata || {}
+  );
 
   // Apply template when selected
   const handleTemplateSelect = (templateId: string) => {
-    setSelectedTemplateId(templateId)
-    const template = templates.find((t) => t.id === templateId)
+    if (templateId === "none") return;
+
+    const template = templates.find((t) => t.id === templateId);
     if (template) {
       // Create empty metadata keys from template
-      const newMetadata: Record<string, any> = { ...metadata }
+      const newMetadata: Record<string, any> = { ...metadata };
       template.keys.forEach((key) => {
         if (!(key in newMetadata)) {
-          newMetadata[key] = ""
+          newMetadata[key] = "";
         }
-      })
-      setMetadata(newMetadata)
+      });
+      setMetadata(newMetadata);
     }
-  }
+  };
 
   const handleMetadataChange = (key: string, value: string) => {
-    setMetadata({ ...metadata, [key]: value })
-  }
+    setMetadata({ ...metadata, [key]: value });
+  };
 
   const handleAddCustomKey = () => {
-    const key = prompt("Enter metadata key name:")
+    const key = prompt("Enter metadata key name:");
     if (key && key.trim()) {
-      setMetadata({ ...metadata, [key.trim()]: "" })
+      setMetadata({ ...metadata, [key.trim()]: "" });
     }
-  }
+  };
 
   const handleRemoveKey = (key: string) => {
-    const newMetadata = { ...metadata }
-    delete newMetadata[key]
-    setMetadata(newMetadata)
-  }
+    const newMetadata = { ...metadata };
+    delete newMetadata[key];
+    setMetadata(newMetadata);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     onSave({
       name,
       description,
-      templateId: selectedTemplateId,
       metadata,
       videoId,
       annotationIds: collection?.annotationIds || [],
-    })
-  }
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,9 +109,9 @@ export function CollectionForm({ collection, templates, videoId, onSave, onCance
 
       <div className="space-y-2">
         <Label htmlFor="template">Apply Template (Optional)</Label>
-        <Select value={selectedTemplateId} onValueChange={handleTemplateSelect}>
+        <Select onValueChange={handleTemplateSelect}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a template" />
+            <SelectValue placeholder="Select a template to apply" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">No Template</SelectItem>
@@ -114,14 +127,21 @@ export function CollectionForm({ collection, templates, videoId, onSave, onCance
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label>Metadata</Label>
-          <Button type="button" variant="outline" size="sm" onClick={handleAddCustomKey}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAddCustomKey}
+          >
             <Plus className="h-3 w-3 mr-1" />
             Add Key
           </Button>
         </div>
 
         {Object.keys(metadata).length === 0 ? (
-          <p className="text-sm text-muted-foreground">No metadata keys. Apply a template or add custom keys.</p>
+          <p className="text-sm text-muted-foreground">
+            No metadata keys. Apply a template or add custom keys.
+          </p>
         ) : (
           <div className="space-y-3 max-h-64 overflow-y-auto border rounded-md p-3">
             {Object.entries(metadata).map(([key, value]) => (
@@ -134,7 +154,13 @@ export function CollectionForm({ collection, templates, videoId, onSave, onCance
                     placeholder={`Enter ${key}`}
                   />
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveKey(key)} className="mt-5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveKey(key)}
+                  className="mt-5"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -147,8 +173,10 @@ export function CollectionForm({ collection, templates, videoId, onSave, onCance
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit">{collection ? "Update Collection" : "Create Collection"}</Button>
+        <Button type="submit">
+          {collection ? "Update Collection" : "Create Collection"}
+        </Button>
       </div>
     </form>
-  )
+  );
 }
