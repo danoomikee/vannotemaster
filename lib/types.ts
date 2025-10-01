@@ -32,7 +32,7 @@ export interface Collection {
   videoId: string;
   name: string;
   description?: string;
-  metadata: Record<string, any>; // Key-value pairs for collection metadata
+  metadata: Record<string, string>; // Key-value pairs for collection metadata
   annotationIds: string[]; // Ordered list of annotation IDs
   createdAt: Date;
   updatedAt: Date;

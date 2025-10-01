@@ -1,6 +1,6 @@
 // lib/utils/data-exchange.ts
 
-import type { Annotation, Video } from "@/lib/types";
+import type { Annotation, Collection, Video } from "@/lib/types";
 import { storage } from "@/lib/storage";
 
 /**
@@ -19,19 +19,25 @@ function downloadFile(filename: string, content: string, mimeType: string) {
 }
 
 /**
- * Exports an array of annotations to a JSON file.
+ * Exports a complete snapshot of a video's data (video details, annotations, collections) to a JSON file.
  */
-export function exportAnnotationsAsJSON(
+export function exportVideoDataAsJSON(
+  video: Video,
   annotations: Annotation[],
-  videoTitle: string
+  collections: Collection[]
 ) {
-  const filename = `${videoTitle.replace(/\s/g, "_")}_annotations.json`;
-  const jsonContent = JSON.stringify(annotations, null, 2);
+  const filename = `${video.title.replace(/\s/g, "_")}_data.json`;
+  const exportData = {
+    video,
+    annotations,
+    collections,
+  };
+  const jsonContent = JSON.stringify(exportData, null, 2);
   downloadFile(filename, jsonContent, "application/json");
 }
 
 /**
- * Converts an array of annotations to a CSV string.
+ * Converts an array of annotations to a CSV string, reflecting the correct Annotation type.
  */
 export function exportAnnotationsAsCSV(
   annotations: Annotation[],
@@ -42,18 +48,14 @@ export function exportAnnotationsAsCSV(
     return;
   }
 
-  // Find all unique metadata keys to create dynamic headers
-  const metadataKeys = [
-    ...new Set(annotations.flatMap((a) => Object.keys(a.metadata))),
-  ];
-
   const headers = [
     "id",
     "title",
     "description",
     "startTime",
     "endTime",
-    ...metadataKeys,
+    "collectionId",
+    "order",
   ];
 
   const csvRows = [
@@ -65,10 +67,8 @@ export function exportAnnotationsAsCSV(
         `"${(ann.description || "").replace(/"/g, '""')}"`,
         ann.startTime,
         ann.endTime ?? "",
-        ...metadataKeys.map(
-          (key) =>
-            `"${(ann.metadata[key] ?? "").toString().replace(/"/g, '""')}"`
-        ),
+        ann.collectionId ?? "",
+        ann.order ?? "",
       ];
       return row.join(",");
     }),
@@ -93,7 +93,12 @@ export async function importAnnotationsFromJSON(
         if (typeof content !== "string") {
           throw new Error("Failed to read file content.");
         }
-        const importedAnnotations = JSON.parse(content);
+        const importedData = JSON.parse(content);
+
+        // Support both old and new JSON export formats
+        const importedAnnotations = Array.isArray(importedData)
+          ? importedData
+          : importedData.annotations;
 
         if (!Array.isArray(importedAnnotations)) {
           throw new Error(
@@ -111,19 +116,21 @@ export async function importAnnotationsFromJSON(
               description: ann.description,
               startTime: ann.startTime,
               endTime: ann.endTime,
-              metadata: ann.metadata || {},
-              templateId: ann.templateId,
+              collectionId: ann.collectionId,
+              order: ann.order,
             });
             importedCount++;
           }
         }
 
         resolve({ success: true, count: importedCount });
-      } catch (e: any) {
+      } catch (e) {
         resolve({
           success: false,
           count: 0,
-          error: e.message || "Failed to parse or import annotations.",
+          error:
+            (e as { message: string }).message ||
+            "Failed to parse or import annotations.",
         });
       }
     };

@@ -183,7 +183,11 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     const togglePlay = () => {
       if (!hasVideo || !isReady) return;
       const player = getPlayerHandle();
-      player?.isPaused() ? player?.play() : player?.pause();
+      if (player?.isPaused) {
+        player?.play();
+      } else {
+        player?.pause();
+      }
     };
 
     const handleSeek = (value: number[]) => {
@@ -208,7 +212,11 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       const newMuted = !isMuted;
       setIsMuted(newMuted);
       if (youtubeId && ytPlayerRef.current) {
-        newMuted ? ytPlayerRef.current.mute() : ytPlayerRef.current.unMute();
+        if (newMuted) {
+          ytPlayerRef.current.mute();
+        } else {
+          ytPlayerRef.current.unMute();
+        }
       } else if (internalVideoRef.current) {
         internalVideoRef.current.muted = newMuted;
       }
@@ -231,11 +239,11 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       }
     };
 
-    const seekToTime = (time: number) => {
-      if (!hasVideo || !isReady) return;
-      const player = getPlayerHandle();
-      player?.seek(time);
-    };
+    // const seekToTime = (time: number) => {
+    //   if (!hasVideo || !isReady) return;
+    //   const player = getPlayerHandle();
+    //   player?.seek(time);
+    // };
 
     return (
       <div

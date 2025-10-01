@@ -6,7 +6,7 @@ import type React from "react";
 import { forwardRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tag, Plus, Settings, Sparkles } from "lucide-react";
+import { Tag, Plus, Settings } from "lucide-react";
 import { formatTime } from "@/lib/utils/video";
 
 interface QuickAnnotationBarProps {

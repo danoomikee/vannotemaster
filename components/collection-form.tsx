@@ -34,7 +34,7 @@ export function CollectionForm({
 }: CollectionFormProps) {
   const [name, setName] = useState(collection?.name || "");
   const [description, setDescription] = useState(collection?.description || "");
-  const [metadata, setMetadata] = useState<Record<string, any>>(
+  const [metadata, setMetadata] = useState<Record<string, string>>(
     collection?.metadata || {}
   );
 
@@ -45,7 +45,7 @@ export function CollectionForm({
     const template = templates.find((t) => t.id === templateId);
     if (template) {
       // Create empty metadata keys from template
-      const newMetadata: Record<string, any> = { ...metadata };
+      const newMetadata: Record<string, string> = { ...metadata };
       template.keys.forEach((key) => {
         if (!(key in newMetadata)) {
           newMetadata[key] = "";

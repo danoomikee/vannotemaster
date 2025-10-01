@@ -46,7 +46,7 @@ import { AnnotationSearchModal } from "@/components/annotation-search-modal";
 
 import {
   exportAnnotationsAsCSV,
-  exportAnnotationsAsJSON,
+  exportVideoDataAsJSON,
   importAnnotationsFromJSON,
 } from "@/lib/utils/data-exchange";
 import { toast } from "sonner";
@@ -77,9 +77,9 @@ export default function DashboardPage() {
     null
   );
   const [showAddAnnotationsModal, setShowAddAnnotationsModal] = useState(false);
-  const [targetCollection, setTargetCollection] = useState<Collection | null>(
-    null
-  );
+  // const [targetCollection, setTargetCollection] = useState<Collection | null>(
+  //   null
+  // );
   const lastOpenedCollectionRef = useRef<string | null>(null);
 
   const [showVideoEditModal, setShowVideoEditModal] = useState(false);
@@ -266,9 +266,11 @@ export default function DashboardPage() {
     (e) => {
       e.preventDefault();
       if (!videoRef.current) return;
-      videoRef.current.isPaused()
-        ? videoRef.current.play()
-        : videoRef.current.pause();
+      if (videoRef.current.isPaused()) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
     },
     { enabled: !!currentVideo }
   );
@@ -311,9 +313,10 @@ export default function DashboardPage() {
 
   useHotkeys("k", (e) => {
     e.preventDefault();
-
     if (currentVideo) {
-      videoRef.current?.isPaused() != false && videoRef.current?.pause();
+      if (videoRef.current && !videoRef.current.isPaused()) {
+        videoRef.current.pause();
+      }
       setShowAnnotationSearch(true);
     }
   });
@@ -575,8 +578,9 @@ export default function DashboardPage() {
     setSelectedCollection(collection);
   };
 
-  const handleAddAnnotationsToCollection = (collection: Collection) => {
-    setTargetCollection(collection);
+  const handleAddAnnotationsToCollection = () => {
+    // collection: Collection
+    // setTargetCollection(collection);
     setShowAddAnnotationsModal(true);
   };
 
@@ -717,7 +721,7 @@ export default function DashboardPage() {
   const handleExport = (format: "json" | "csv") => {
     if (!currentVideo) return;
     if (format === "json") {
-      exportAnnotationsAsJSON(annotations, currentVideo.title);
+      exportVideoDataAsJSON(currentVideo, annotations, collections);
     } else {
       exportAnnotationsAsCSV(annotations, currentVideo.title);
     }

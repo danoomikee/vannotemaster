@@ -30,14 +30,14 @@ interface CollectionDetailViewProps {
 export function CollectionDetailView({
   collection,
   annotations,
-  templates,
+  // templates,
   collections,
   onBack,
   onEdit,
   onAddAnnotations,
   onAnnotationClick,
   onRemoveAnnotation,
-  onReorderAnnotations,
+  // onReorderAnnotations,
   onCollectionChange,
 }: CollectionDetailViewProps) {
   return (

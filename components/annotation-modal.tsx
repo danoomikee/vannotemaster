@@ -1,53 +1,59 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Clock } from "lucide-react"
-import type { Annotation, Template } from "@/lib/types"
-import { formatTime, parseTime } from "@/lib/utils/video"
-import { ScrollArea } from "./ui/scroll-area"
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Clock } from "lucide-react";
+import type { Annotation, Template } from "@/lib/types";
+import { formatTime, parseTime } from "@/lib/utils/video";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface AnnotationModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  annotation?: Annotation | null
-  templates: Template[]
-  onSave: (data: Partial<Annotation>) => void
-  defaultStartTime?: number
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  annotation?: Annotation | null;
+  templates: Template[];
+  onSave: (data: Partial<Annotation>) => void;
+  defaultStartTime?: number;
 }
 
 export function AnnotationModal({
   open,
   onOpenChange,
   annotation,
-  templates,
+  // templates,
   onSave,
   defaultStartTime,
 }: AnnotationModalProps) {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [startTime, setStartTime] = useState(0)
-  const [endTime, setEndTime] = useState<number | undefined>(undefined)
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (open) {
       if (annotation) {
-        setTitle(annotation.title)
-        setDescription(annotation.description || "")
-        setStartTime(annotation.startTime)
-        setEndTime(annotation.endTime)
+        setTitle(annotation.title);
+        setDescription(annotation.description || "");
+        setStartTime(annotation.startTime);
+        setEndTime(annotation.endTime);
       } else {
-        setTitle("")
-        setDescription("")
-        setStartTime(defaultStartTime || 0)
-        setEndTime(undefined)
+        setTitle("");
+        setDescription("");
+        setStartTime(defaultStartTime || 0);
+        setEndTime(undefined);
       }
     }
-  }, [annotation, open, defaultStartTime])
+  }, [annotation, open, defaultStartTime]);
 
   const handleSave = () => {
     onSave({
@@ -56,25 +62,35 @@ export function AnnotationModal({
       description,
       startTime,
       endTime,
-    })
-  }
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{annotation ? "Edit Annotation" : "Create Annotation"}</DialogTitle>
+          <DialogTitle>
+            {annotation ? "Edit Annotation" : "Create Annotation"}
+          </DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="max-h-[70vh]">
           <div className="space-y-4 p-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
-              <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -98,7 +114,9 @@ export function AnnotationModal({
                 <Input
                   id="end-time"
                   value={endTime !== undefined ? formatTime(endTime) : ""}
-                  onChange={(e) => setEndTime(parseTime(e.target.value) || undefined)}
+                  onChange={(e) =>
+                    setEndTime(parseTime(e.target.value) || undefined)
+                  }
                   placeholder="Optional"
                 />
               </div>
@@ -115,5 +133,5 @@ export function AnnotationModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
