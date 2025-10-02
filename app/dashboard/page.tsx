@@ -32,7 +32,7 @@ import { ShortcutsModal } from "@/components/shortcuts-modal"
 import { AnnotationSearchModal } from "@/components/annotation-search-modal"
 import { SeekToTimeModal } from "@/components/seek-to-time-modal"
 
-import { exportAnnotationsAsCSV, exportVideoDataAsJSON, importAnnotationsFromJSON } from "@/lib/utils/data-exchange"
+import { exportAllDataAsJSON, exportAllDataAsCSV, importAllDataFromJSON } from "@/lib/utils/data-exchange"
 import { toast } from "sonner"
 import { VideoEditModal } from "@/components/video-edit-modal"
 import { CollectionModal } from "@/components/collection-modal"
@@ -703,12 +703,11 @@ export default function DashboardPage() {
 
   // Export / Import Handlers
 
-  const handleExport = (format: "json" | "csv") => {
-    if (!currentVideo) return
+  const handleExport = async (format: "json" | "csv") => {
     if (format === "json") {
-      exportVideoDataAsJSON(currentVideo, annotations, collections)
+      await exportAllDataAsJSON()
     } else {
-      exportAnnotationsAsCSV(currentVideo, annotations, collections)
+      await exportAllDataAsCSV()
     }
   }
 
@@ -718,20 +717,26 @@ export default function DashboardPage() {
 
   const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (!file || !currentVideo) return
+    if (!file) return
 
-    const result = await importAnnotationsFromJSON(file, currentVideo.id)
+    const result = await importAllDataFromJSON(file)
 
     if (result.success) {
       toast.success("Import Successful", {
-        description: `Successfully imported ${result.count} annotations.`,
+        description: result.details
+          ? `Imported ${result.details.videos} videos, ${result.details.collections} collections, ${result.details.annotations} annotations, and ${result.details.templates} templates.`
+          : result.message,
       })
-      // Refresh annotations
-      const videoAnnotations = await storage.getAnnotationsByVideo(currentVideo.id)
-      setAnnotations(videoAnnotations)
+      // Refresh all data
+      await loadVideos()
+      await loadTemplates()
+      if (currentVideo) {
+        await loadAnnotations(currentVideo.id)
+        await loadCollections(currentVideo.id)
+      }
     } else {
-      toast.warning("Import Failed", {
-        description: result.error || "An unknown error occurred.",
+      toast.error("Import Failed", {
+        description: result.message,
       })
     }
 
@@ -775,8 +780,8 @@ export default function DashboardPage() {
         }}
         filter={filter}
         onFilterChange={setFilter}
-        onExportAnnotations={handleExport}
-        onImportAnnotations={handleImport}
+        onExportData={handleExport}
+        onImportData={handleImport}
       />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
         <header className="bg-background sticky top-0 flex h-12 shrink-0 items-center gap-2 border-b px-4 z-10">

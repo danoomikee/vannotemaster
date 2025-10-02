@@ -1,16 +1,12 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import type { Video, Annotation, Template, Collection } from "@/lib/types";
-import { formatTime } from "@/lib/utils/video";
+import * as React from "react"
+import type { Video, Annotation, Template, Collection } from "@/lib/types"
+import { formatTime } from "@/lib/utils/video"
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +18,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@/components/ui/sidebar"
 
 import {
   DropdownMenu,
@@ -30,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   ChevronRight,
   FileVideo,
@@ -43,37 +39,37 @@ import {
   Download,
   Upload,
   FolderOpen,
-} from "lucide-react";
+} from "lucide-react"
 
-import { Input } from "./ui/input";
+import { Input } from "./ui/input"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  videos: Video[];
-  annotations: Annotation[];
-  collections: Collection[];
-  templates: Template[];
-  currentVideo?: Video | null;
-  selectedCollection?: Collection | null;
-  onVideoSelect?: (video: Video) => void;
-  onAnnotationClick?: (annotation: Annotation) => void;
-  onEditAnnotation?: (annotation: Annotation) => void;
-  onDeleteAnnotation?: (annotationId: string) => void;
-  onSelectCollection?: (collection: Collection) => void;
-  onEditCollection?: (collection: Collection) => void;
-  onDeleteCollection?: (collectionId: string) => void;
-  onCreateCollection?: () => void;
-  onDeleteVideo?: (videoId: string) => void;
-  onEditVideo?: (video: Video) => void;
-  onEditTemplate?: (template: Template) => void;
-  onDeleteTemplate?: (templateId: string) => void;
-  onCreateVideo?: () => void;
-  onCreateTemplate?: () => void;
+  videos: Video[]
+  annotations: Annotation[]
+  collections: Collection[]
+  templates: Template[]
+  currentVideo?: Video | null
+  selectedCollection?: Collection | null
+  onVideoSelect?: (video: Video) => void
+  onAnnotationClick?: (annotation: Annotation) => void
+  onEditAnnotation?: (annotation: Annotation) => void
+  onDeleteAnnotation?: (annotationId: string) => void
+  onSelectCollection?: (collection: Collection) => void
+  onEditCollection?: (collection: Collection) => void
+  onDeleteCollection?: (collectionId: string) => void
+  onCreateCollection?: () => void
+  onDeleteVideo?: (videoId: string) => void
+  onEditVideo?: (video: Video) => void
+  onEditTemplate?: (template: Template) => void
+  onDeleteTemplate?: (templateId: string) => void
+  onCreateVideo?: () => void
+  onCreateTemplate?: () => void
   // filter enabling
-  filter: string;
-  onFilterChange: (filter: string) => void;
+  filter: string
+  onFilterChange: (filter: string) => void
   // import/export
-  onExportAnnotations?: (format: "json" | "csv") => void;
-  onImportAnnotations?: () => void;
+  onExportData?: (format: "json" | "csv") => void
+  onImportData?: () => void
 }
 
 export function AppSidebar({
@@ -99,26 +95,24 @@ export function AppSidebar({
   onDeleteTemplate,
   onCreateVideo,
   onCreateTemplate,
-  onExportAnnotations,
-  onImportAnnotations,
+  onExportData,
+  onImportData,
   ...props
 }: AppSidebarProps) {
   const handleDeleteVideo = async (videoId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm("Delete this video and all its annotations?")) return;
+    e.stopPropagation()
+    if (!confirm("Delete this video and all its annotations?")) return
 
     try {
-      onDeleteVideo?.(videoId);
+      onDeleteVideo?.(videoId)
     } catch (error) {
-      console.error("Error deleting video:", error);
+      console.error("Error deleting video:", error)
     }
-  };
+  }
 
   const unassignedAnnotations = React.useMemo(() => {
-    return [...annotations]
-      .filter((a) => !a.collectionId)
-      .sort((a, b) => a.startTime - b.startTime);
-  }, [annotations]);
+    return [...annotations].filter((a) => !a.collectionId).sort((a, b) => a.startTime - b.startTime)
+  }, [annotations])
 
   return (
     <Sidebar {...props}>
@@ -129,17 +123,29 @@ export function AppSidebar({
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="font-semibold">VanNote</span>
-            <span className="text-xs text-muted-foreground">
-              Video Annotator
-            </span>
+            <span className="text-xs text-muted-foreground">Video Annotator</span>
           </div>
         </div>
+        <div className="px-2 pb-2 flex gap-2">
+          <Button variant="outline" size="sm" className="flex-1 bg-transparent" onClick={() => onImportData?.()}>
+            <Upload className="h-3 w-3 mr-1" />
+            Import
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                <Download className="h-3 w-3 mr-1" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => onExportData?.("json")}>Export as JSON</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onExportData?.("csv")}>Export as CSV</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <div className="p-2">
-          <Input
-            placeholder="Filter..."
-            value={filter}
-            onChange={(e) => onFilterChange(e.target.value)}
-          />
+          <Input placeholder="Filter..." value={filter} onChange={(e) => onFilterChange(e.target.value)} />
         </div>
       </SidebarHeader>
 
@@ -167,19 +173,13 @@ export function AppSidebar({
                   ) : (
                     videos.map((video) => (
                       <SidebarMenuItem key={video.id}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={currentVideo?.id === video.id}
-                          className="group"
-                        >
+                        <SidebarMenuButton asChild isActive={currentVideo?.id === video.id} className="group">
                           <div
                             className="flex items-center gap-2 cursor-pointer"
                             onClick={() => onVideoSelect?.(video)}
                           >
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm truncate">
-                                {video.title}
-                              </div>
+                              <div className="font-medium text-sm truncate">{video.title}</div>
                               <div className="text-xs text-muted-foreground">
                                 {new Date(video.createdAt).toLocaleDateString()}
                               </div>
@@ -195,43 +195,16 @@ export function AppSidebar({
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <DropdownMenuItem
-                                  onClick={() => onEditVideo?.(video)}
-                                >
+                              <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenuItem onClick={() => onEditVideo?.(video)}>
                                   <Edit className="h-4 w-4 mr-2" /> Edit Video
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                  onClick={() => onImportAnnotations?.()}
-                                >
-                                  <Upload className="h-4 w-4 mr-2" /> Import
-                                  Annotations
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => onExportAnnotations?.("json")}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> Export
-                                  as JSON
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => onExportAnnotations?.("csv")}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> Export
-                                  as CSV
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
                                   className="text-destructive"
-                                  onClick={(e) =>
-                                    handleDeleteVideo(video.id, e)
-                                  }
+                                  onClick={(e) => handleDeleteVideo(video.id, e)}
                                 >
-                                  <Trash2 className="h-4 w-4 mr-2" /> Delete
-                                  Video
+                                  <Trash2 className="h-4 w-4 mr-2" /> Delete Video
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -293,9 +266,7 @@ export function AppSidebar({
                               onClick={() => onSelectCollection?.(collection)}
                             >
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm truncate">
-                                  {collection.name}
-                                </div>
+                                <div className="font-medium text-sm truncate">{collection.name}</div>
                                 <div className="text-xs text-muted-foreground">
                                   {collection.annotationIds.length} annotations
                                 </div>
@@ -307,8 +278,8 @@ export function AppSidebar({
                                   size="sm"
                                   className="h-6 w-6 p-0"
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    onEditCollection?.(collection);
+                                    e.stopPropagation()
+                                    onEditCollection?.(collection)
                                   }}
                                 >
                                   <Edit className="h-3 w-3" />
@@ -318,13 +289,9 @@ export function AppSidebar({
                                   size="sm"
                                   className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (
-                                      confirm(
-                                        "Delete this collection? Annotations will be unassigned."
-                                      )
-                                    ) {
-                                      onDeleteCollection?.(collection.id);
+                                    e.stopPropagation()
+                                    if (confirm("Delete this collection? Annotations will be unassigned.")) {
+                                      onDeleteCollection?.(collection.id)
                                     }
                                   }}
                                 >
@@ -374,9 +341,7 @@ export function AppSidebar({
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {unassignedAnnotations.length === 0 ? (
-                      <div className="px-4 py-3 text-xs text-muted-foreground">
-                        All annotations are in collections.
-                      </div>
+                      <div className="px-4 py-3 text-xs text-muted-foreground">All annotations are in collections.</div>
                     ) : (
                       unassignedAnnotations.map((annotation) => (
                         <SidebarMenuItem key={annotation.id}>
@@ -386,19 +351,14 @@ export function AppSidebar({
                               onClick={() => onAnnotationClick?.(annotation)}
                             >
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm truncate">
-                                  {annotation.title}
-                                </div>
+                                <div className="font-medium text-sm truncate">{annotation.title}</div>
                                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                                   {formatTime(annotation.startTime)}
                                   {annotation.endTime && (
                                     <>
                                       <span>→</span>
                                       {formatTime(annotation.endTime)}
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-[10px] h-4 px-1"
-                                      >
+                                      <Badge variant="secondary" className="text-[10px] h-4 px-1">
                                         Segment
                                       </Badge>
                                     </>
@@ -412,8 +372,8 @@ export function AppSidebar({
                                   size="sm"
                                   className="h-6 w-6 p-0"
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    onEditAnnotation?.(annotation);
+                                    e.stopPropagation()
+                                    onEditAnnotation?.(annotation)
                                   }}
                                 >
                                   <Edit className="h-3 w-3" />
@@ -423,8 +383,8 @@ export function AppSidebar({
                                   size="sm"
                                   className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    onDeleteAnnotation?.(annotation.id);
+                                    e.stopPropagation()
+                                    onDeleteAnnotation?.(annotation.id)
                                   }}
                                 >
                                   <Trash2 className="h-3 w-3" />
@@ -460,8 +420,7 @@ export function AppSidebar({
                 <SidebarMenu>
                   {templates.length === 0 ? (
                     <div className="px-4 py-3 text-xs text-muted-foreground">
-                      No templates yet. Create one to structure your
-                      collections.
+                      No templates yet. Create one to structure your collections.
                     </div>
                   ) : (
                     templates.map((template) => (
@@ -469,9 +428,7 @@ export function AppSidebar({
                         <SidebarMenuButton asChild className="group">
                           <div className="flex items-center gap-2">
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm truncate">
-                                {template.name}
-                              </div>
+                              <div className="font-medium text-sm truncate">{template.name}</div>
                               <div className="text-xs text-muted-foreground truncate">
                                 {template.keys.length} fields
                               </div>
@@ -483,8 +440,8 @@ export function AppSidebar({
                                 size="sm"
                                 className="h-6 w-6 p-0"
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  onEditTemplate?.(template);
+                                  e.stopPropagation()
+                                  onEditTemplate?.(template)
                                 }}
                               >
                                 <Edit className="h-3 w-3" />
@@ -494,9 +451,9 @@ export function AppSidebar({
                                 size="sm"
                                 className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                                 onClick={(e) => {
-                                  e.stopPropagation();
+                                  e.stopPropagation()
                                   if (confirm("Delete this template?")) {
-                                    onDeleteTemplate?.(template.id);
+                                    onDeleteTemplate?.(template.id)
                                   }
                                 }}
                               >
@@ -530,5 +487,5 @@ export function AppSidebar({
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  );
+  )
 }
