@@ -1,12 +1,7 @@
 // src/components/shortcuts-modal.tsx
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import type { ReactNode } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import type { ReactNode } from "react"
 
 // Kbd component for styling keyboard keys
 function Kbd({ children }: { children: ReactNode }) {
@@ -14,18 +9,19 @@ function Kbd({ children }: { children: ReactNode }) {
     <kbd className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-background border rounded-lg">
       {children}
     </kbd>
-  );
+  )
 }
 
 interface ShortcutsModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function ShortcutsModal({ open, onOpenChange }: ShortcutsModalProps) {
   const shortcuts = [
     { key: "Space", action: "Play / Pause video", category: "Video" },
     { key: "← / →", action: "Seek 5s backward / forward", category: "Video" },
+    { key: "G", action: "Seek to specific time", category: "Video" },
     { key: "M", action: "Create a quick annotation", category: "Annotations" },
     {
       key: "Shift + M",
@@ -62,10 +58,10 @@ export function ShortcutsModal({ open, onOpenChange }: ShortcutsModalProps) {
     },
     { key: "Shift + →", action: "Next collection", category: "Collections" },
     { key: "?", action: "Show keyboard shortcuts", category: "General" },
-  ];
+  ]
 
   // Group shortcuts by category
-  const categories = Array.from(new Set(shortcuts.map((s) => s.category)));
+  const categories = Array.from(new Set(shortcuts.map((s) => s.category)))
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -76,9 +72,7 @@ export function ShortcutsModal({ open, onOpenChange }: ShortcutsModalProps) {
         <div className="grid gap-6 py-4">
           {categories.map((category) => (
             <div key={category}>
-              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
-                {category}
-              </h3>
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">{category}</h3>
               <ul className="space-y-2">
                 {shortcuts
                   .filter((s) => s.category === category)
@@ -94,5 +88,5 @@ export function ShortcutsModal({ open, onOpenChange }: ShortcutsModalProps) {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
